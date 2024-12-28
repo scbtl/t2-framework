@@ -14,6 +14,7 @@
 
 namespace app;
 
+use RedisException;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -42,9 +43,10 @@ class Cache
      */
     public static $instances = [];
 
-    /***
+    /**
      * @param string|null $name
      * @return Psr16Cache
+     * @throws RedisException
      */
     public static function store(?string $name = null): Psr16Cache
     {
@@ -90,6 +92,7 @@ class Cache
      * @param $name
      * @param $arguments
      * @return mixed
+     * @throws RedisException
      */
     public static function __callStatic($name, $arguments)
     {
