@@ -4,10 +4,6 @@ use app\Container;
 use app\Request;
 use app\Response;
 use app\Translation;
-use app\view\Twig;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use t2\App;
 use t2\Config;
 use t2\route;
@@ -246,21 +242,6 @@ if (!function_exists('view')) {
         $handler = config($plugin ? "plugin.$plugin.view.handler" : 'view.handler');
 
         return new Response(200, [], $handler::render($template, $vars, $app, $plugin));
-    }
-}
-
-if (!function_exists('twig_view')) {
-    /**
-     * Twig view response
-     * @param mixed $template
-     * @param array $vars
-     * @param string|null $app
-     * @param string|null $plugin
-     * @return Response
-     */
-    function twig_view(mixed $template = null, array $vars = [], ?string $app = null, ?string $plugin = null): Response
-    {
-        return new Response(200, [], Twig::render(...template_inputs($template, $vars, $app, $plugin)));
     }
 }
 
