@@ -108,7 +108,7 @@ class Twig implements View
 
         // 合并全局视图变量和当前渲染变量
         if (!empty($request->_view_vars)) {
-            $vars = array_merge((array)$request->_view_vars, $vars);
+            $vars = array_merge($request->_view_vars, $vars);
         }
 
         // 渲染模板并返回结果
