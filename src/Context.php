@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of webman.
  *
@@ -25,17 +26,22 @@ use Workerman\Events\Swow;
 use Workerman\Worker;
 use function property_exists;
 
+/**
+ * Class Context
+ * @package Webman
+ */
 class Context
 {
     /**
      * @var SplObjectStorage|WeakMap
      */
-    protected static WeakMap|SplObjectStorage $objectStorage;
+    protected static $objectStorage;
 
     /**
      * @var StdClass
      */
-    protected static StdClass $object;
+    protected static $object;
+
 
     /**
      * @return void
@@ -57,14 +63,13 @@ class Context
         if (!isset(static::$objectStorage[$key])) {
             static::$objectStorage[$key] = new StdClass;
         }
-
         return static::$objectStorage[$key];
     }
 
     /**
-     * @return Fiber|StdClass|null
+     * @return mixed
      */
-    protected static function getKey(): StdClass|Fiber|null
+    protected static function getKey(): mixed
     {
         return match (Worker::$eventLoopClass) {
             Revolt::class => Fiber::getCurrent(),
@@ -76,15 +81,14 @@ class Context
 
     /**
      * @param string|null $key
-     * @return StdClass|null
+     * @return mixed
      */
-    public static function get(?string $key = null): ?StdClass
+    public static function get(?string $key = null): mixed
     {
         $obj = static::getObject();
         if ($key === null) {
             return $obj;
         }
-
         return $obj->$key ?? null;
     }
 
@@ -116,7 +120,6 @@ class Context
     public static function has(string $key): bool
     {
         $obj = static::getObject();
-
         return property_exists($obj, $key);
     }
 
