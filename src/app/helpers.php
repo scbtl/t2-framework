@@ -1,7 +1,6 @@
 <?php
 
 use app\Container;
-use app\Env;
 use app\Request;
 use app\Response;
 use app\Translation;
@@ -146,20 +145,6 @@ if (!function_exists('path_combine')) {
     function path_combine(string $front, string $back): string
     {
         return $front . ($back ? (DIRECTORY_SEPARATOR . ltrim($back, DIRECTORY_SEPARATOR)) : $back);
-    }
-}
-
-if (!function_exists('env')) {
-    /**
-     * 获取环境变量值
-     * @access public
-     * @param ?string $name 环境变量名（支持二级 .号分割）
-     * @param ?string $default 默认值
-     * @return mixed
-     */
-    function env(string $name = null, string $default = null): mixed
-    {
-        return Env::get($name, $default);
     }
 }
 
