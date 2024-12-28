@@ -70,7 +70,6 @@ use function ob_start;
 use function pathinfo;
 use function scandir;
 use function str_replace;
-use function strpos;
 use function strtolower;
 use function substr;
 use function trim;
@@ -252,16 +251,18 @@ class App
             $plugin = $request->plugin ?: '';
             $exceptionConfig = static::config($plugin, 'exception');
             $appExceptionConfig = static::config("", 'exception');
-            if (!isset($exceptionConfig['']) && isset($appExceptionConfig['@'])) {
-                //如果插件没有配置自己的异常处理器并且配置了全局@异常处理器 则使用全局异常处理器
-                $defaultException = $appExceptionConfig['@'] ?? ExceptionHandler::class;
-            } else {
-                $defaultException = $exceptionConfig[''] ?? ExceptionHandler::class;
+
+            // 检查插件是否配置了异常处理器并且全局是否配置了异常处理器
+            $defaultException = ExceptionHandler::class;
+            if (isset($appExceptionConfig['@'])) {
+                // 如果插件没有配置自己的异常处理器且全局配置了异常处理器，则使用全局异常处理器
+                $defaultException = $appExceptionConfig['@'];
             }
+
             $exceptionHandlerClass = $exceptionConfig[$app] ?? $defaultException;
 
             /** @var ExceptionHandlerInterface $exceptionHandler */
-            $exceptionHandler = (static::container($plugin) ?? static::container(''))->make($exceptionHandlerClass, [
+            $exceptionHandler = (static::container($plugin) ?? static::container())->make($exceptionHandlerClass, [
                 'logger' => static::$logger,
                 'debug'  => static::config($plugin, 'app.debug')
             ]);
@@ -304,7 +305,7 @@ class App
         $isController = is_array($call) && is_string($call[0]);
         $middlewares = array_merge($middlewares, Middleware::getMiddleware($plugin, $app, $isController ? $call[0] : '', $withGlobalMiddleware));
 
-        $container = static::container($plugin) ?? static::container('');
+        $container = static::container($plugin) ?? static::container();
         foreach ($middlewares as $key => $item) {
             $middleware = $item[0];
             if (is_string($middleware)) {
@@ -1072,7 +1073,6 @@ class App
         return Config::get($plugin ? "plugin.$plugin.$key" : $key, $default);
     }
 
-
     /**
      * @param $data
      * @return string
@@ -1080,19 +1080,12 @@ class App
     protected static function stringify($data): string
     {
         $type = gettype($data);
-        switch ($type) {
-            case 'boolean':
-                return $data ? 'true' : 'false';
-            case 'NULL':
-                return 'NULL';
-            case 'array':
-                return 'Array';
-            case 'object':
-                if (!method_exists($data, '__toString')) {
-                    return 'Object';
-                }
-            default:
-                return (string)$data;
-        }
+        return match ($type) {
+            'boolean' => $data ? 'true' : 'false',
+            'NULL'    => 'NULL',
+            'array'   => 'Array',
+            'object'  => method_exists($data, '__toString') ? (string)$data : 'Object',
+            default   => (string)$data,
+        };
     }
 }
