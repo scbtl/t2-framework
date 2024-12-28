@@ -14,7 +14,6 @@
 
 namespace app;
 
-use Dotenv\Dotenv;
 use RuntimeException;
 use t2\Config;
 use t2\Util;
@@ -35,51 +34,29 @@ class App
      */
     public static function run(): void
     {
+        // 启用错误显示并设置为报告所有错误
         ini_set('display_errors', 'on');
         error_reporting(E_ALL);
 
-        if (class_exists(Dotenv::class) && file_exists(run_path('.env'))) {
-            if (method_exists(Dotenv::class, 'createUnsafeImmutable')) {
-                Dotenv::createUnsafeImmutable(run_path())->load();
-            } else {
-                Dotenv::createMutable(run_path())->load();
-            }
-        }
-
-        if (!$appConfigFile = config_path('app.php')) {
-            throw new RuntimeException('Config file not found: app.php');
-        }
-
-        $appConfig = require $appConfigFile;
-        if ($timezone = $appConfig['default_timezone'] ?? '') {
-            date_default_timezone_set($timezone);
-        }
-
-        static::loadAllConfig(['route', 'container']);
+        // 加载环境变量
+        self::loadEnv();
 
         if (DIRECTORY_SEPARATOR === '\\' && empty(config('server.listen'))) {
             echo "Please run 'php windows.php' on windows system." . PHP_EOL;
             exit;
         }
 
-        $errorReporting = config('app.error_reporting');
-        if (isset($errorReporting)) {
-            error_reporting($errorReporting);
-        }
+        // 设置默认时区
+        self::configureTimezone();
 
-        $runtimeLogsPath = runtime_path() . DIRECTORY_SEPARATOR . 'logs';
-        if (!file_exists($runtimeLogsPath) || !is_dir($runtimeLogsPath)) {
-            if (!mkdir($runtimeLogsPath, 0777, true)) {
-                throw new RuntimeException("Failed to create runtime logs directory. Please check the permission.");
-            }
-        }
+        static::loadAllConfig(['route', 'container']);
 
-        $runtimeViewsPath = runtime_path() . DIRECTORY_SEPARATOR . 'views';
-        if (!file_exists($runtimeViewsPath) || !is_dir($runtimeViewsPath)) {
-            if (!mkdir($runtimeViewsPath, 0777, true)) {
-                throw new RuntimeException("Failed to create runtime views directory. Please check the permission.");
-            }
-        }
+        // 配置错误报告级别
+        self::configureErrorReporting();
+
+        // 确保日志和视图目录存在
+        self::ensureDirectoryExists(runtime_path() . DIRECTORY_SEPARATOR . 'logs', 'runtime logs');
+        self::ensureDirectoryExists(runtime_path() . DIRECTORY_SEPARATOR . 'views', 'runtime views');
 
         Worker::$onMasterReload = function () {
             if (function_exists('opcache_get_status')) {
@@ -154,6 +131,49 @@ class App
         }
 
         Worker::runAll();
+    }
+
+    /**
+     * 加载环境变量
+     * @return void
+     */
+    private static function loadEnv(): void
+    {
+        // 检查并加载 .env 文件
+        if (class_exists(Env::class) && method_exists(Env::class, 'load')) {
+            @Env::load(base_path('.env'));
+        }
+    }
+
+    /**
+     * 设置默认时区
+     * @return void
+     */
+    private static function configureTimezone(): void
+    {
+        date_default_timezone_set(config('app.default_timezone') ?? date_default_timezone_get());
+    }
+
+    /**
+     * 配置错误报告级别
+     * @return void
+     */
+    private static function configureErrorReporting(): void
+    {
+        error_reporting(config('app.error_reporting') ?? error_reporting());
+    }
+
+    /**
+     * 日志保存目录，如果目录不存在则创建
+     * @param string $path
+     * @param string $name
+     * @return void
+     */
+    private static function ensureDirectoryExists(string $path, string $name): void
+    {
+        if (!is_dir($path) && !@mkdir($path, 0777, true)) {
+            throw new RuntimeException("Failed to create $name directory. Please check permissions.");
+        }
     }
 
     /**
