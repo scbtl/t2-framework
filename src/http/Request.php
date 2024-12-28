@@ -19,7 +19,6 @@ use function current;
 use function filter_var;
 use function ip2long;
 use function is_array;
-use function strpos;
 use const FILTER_FLAG_IPV4;
 use const FILTER_FLAG_NO_PRIV_RANGE;
 use const FILTER_FLAG_NO_RES_RANGE;
@@ -28,24 +27,24 @@ use const FILTER_VALIDATE_IP;
 class Request extends \Workerman\Protocols\Http\Request
 {
     /**
-     * @var string
+     * @var string|null
      */
-    public $app = null;
+    public ?string $app = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $controller = null;
+    public ?string $controller = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $action = null;
+    public ?string $action = null;
 
     /**
-     * @var Route
+     * @var Route|null
      */
-    public $route = null;
+    public ?Route $route = null;
 
     /**
      * @var array
@@ -53,14 +52,19 @@ class Request extends \Workerman\Protocols\Http\Request
     public array $_view_vars = [];
 
     /**
+     * @var array
+     */
+    public array $data = [];
+
+    /**
      * @var bool
      */
-    protected $isDirty = false;
+    protected bool $isDirty = false;
 
     /**
      * @return mixed|null
      */
-    public function all()
+    public function all(): mixed
     {
         return $this->get() + $this->post();
     }
@@ -68,10 +72,10 @@ class Request extends \Workerman\Protocols\Http\Request
     /**
      * Input
      * @param string $name
-     * @param mixed $default
-     * @return mixed
+     * @param mixed|null $default
+     * @return mixed|null
      */
-    public function input(string $name, mixed $default = null)
+    public function input(string $name, mixed $default = null): mixed
     {
         return $this->get($name, $this->post($name, $default));
     }
@@ -98,12 +102,13 @@ class Request extends \Workerman\Protocols\Http\Request
      * @param array $keys
      * @return mixed|null
      */
-    public function except(array $keys)
+    public function except(array $keys): mixed
     {
         $all = $this->all();
         foreach ($keys as $key) {
             unset($all[$key]);
         }
+
         return $all;
     }
 
@@ -118,6 +123,7 @@ class Request extends \Workerman\Protocols\Http\Request
         if (null === $files) {
             return $name === null ? [] : null;
         }
+
         if ($name !== null) {
             // Multi files
             if (is_array(current($files))) {
@@ -134,6 +140,7 @@ class Request extends \Workerman\Protocols\Http\Request
                 $uploadFiles[$name] = $this->parseFile($file);
             }
         }
+
         return $uploadFiles;
     }
 
@@ -291,7 +298,7 @@ class Request extends \Workerman\Protocols\Http\Request
      */
     public function acceptJson(): bool
     {
-        return false !== strpos($this->header('accept', ''), 'json');
+        return str_contains($this->header('accept', ''), 'json');
     }
 
     /**
