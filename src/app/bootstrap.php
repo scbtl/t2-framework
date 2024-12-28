@@ -28,11 +28,14 @@ if (empty(Worker::$eventLoopClass)) {
     Worker::$eventLoopClass = Select::class;
 }
 
-set_error_handler(function ($level, $message, $file = '', $line = 0) {
-    if (error_reporting() & $level) {
-        throw new ErrorException($message, 0, $level, $file, $line);
+set_error_handler(
+/** @throws ErrorException */
+    function ($level, $message, $file = '', $line = 0) {
+        if (error_reporting() & $level) {
+            throw new ErrorException($message, 0, $level, $file, $line);
+        }
     }
-});
+);
 
 if ($worker) {
     register_shutdown_function(function ($startTime) {
