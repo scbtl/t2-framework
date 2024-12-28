@@ -26,23 +26,23 @@ class Monitor
     /**
      * @var array
      */
-    protected $paths = [];
+    protected array $paths = [];
 
     /**
      * @var array
      */
-    protected $extensions = [];
+    protected array $extensions = [];
 
     /**
      * @var array
      */
-    protected $loadedFiles = [];
+    protected array $loadedFiles = [];
 
     /**
      * Pause monitor
      * @return void
      */
-    public static function pause()
+    public static function pause(): void
     {
         file_put_contents(static::lockFile(), time());
     }
@@ -194,7 +194,7 @@ class Monitor
      * @param $memoryLimit
      * @return void
      */
-    public function checkMemory($memoryLimit)
+    public function checkMemory($memoryLimit): void
     {
         if (static::isPaused() || $memoryLimit <= 0) {
             return;
@@ -227,9 +227,10 @@ class Monitor
 
     /**
      * Get memory limit
-     * @return float
+     * @param $memoryLimit
+     * @return float|int
      */
-    protected function getMemoryLimit($memoryLimit)
+    protected function getMemoryLimit($memoryLimit): float|int
     {
         if ($memoryLimit === 0) {
             return 0;
