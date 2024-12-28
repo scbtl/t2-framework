@@ -71,6 +71,21 @@ if (!function_exists('base_path')) {
     }
 }
 
+if (!function_exists('vendor')) {
+    /**
+     * 获取 vendor 目录下的文件路径
+     *
+     * @param string $path 文件的相对路径
+     * @return string 完整路径
+     */
+    function vendor(string $path = ''): string
+    {
+        // 获取项目根目录的绝对路径
+        $vendorPath = __DIR__ . '/vendor';
+        return rtrim($vendorPath, '/') . '/' . ltrim($path, '/');
+    }
+}
+
 if (!function_exists('app_path')) {
     /**
      * App path
@@ -544,7 +559,7 @@ if (!function_exists('worker_start')) {
         }
 
         $worker->onWorkerStart = function ($worker) use ($config) {
-            require_once base_path('/app/bootstrap.php');
+            require_once vendor('app/bootstrap.php');
             if (isset($config['handler'])) {
                 if (!class_exists($config['handler'])) {
                     echo "process error: class {$config['handler']} not exists\r\n";
