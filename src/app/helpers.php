@@ -4,8 +4,6 @@ use app\Container;
 use app\Request;
 use app\Response;
 use app\Translation;
-use app\view\Blade;
-use app\view\Raw;
 use app\view\Twig;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -248,37 +246,6 @@ if (!function_exists('view')) {
         $handler = config($plugin ? "plugin.$plugin.view.handler" : 'view.handler');
 
         return new Response(200, [], $handler::render($template, $vars, $app, $plugin));
-    }
-}
-
-if (!function_exists('raw_view')) {
-    /**
-     * Raw view response
-     * @param mixed $template
-     * @param array $vars
-     * @param string|null $app
-     * @param string|null $plugin
-     * @return Response
-     * @throws Throwable
-     */
-    function raw_view(mixed $template = null, array $vars = [], ?string $app = null, ?string $plugin = null): Response
-    {
-        return new Response(200, [], Raw::render(...template_inputs($template, $vars, $app, $plugin)));
-    }
-}
-
-if (!function_exists('blade_view')) {
-    /**
-     * Blade view response
-     * @param mixed $template
-     * @param array $vars
-     * @param string|null $app
-     * @param string|null $plugin
-     * @return Response
-     */
-    function blade_view(mixed $template = null, array $vars = [], ?string $app = null, ?string $plugin = null): Response
-    {
-        return new Response(200, [], Blade::render(...template_inputs($template, $vars, $app, $plugin)));
     }
 }
 
