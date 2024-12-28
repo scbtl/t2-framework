@@ -43,8 +43,14 @@ if ($worker) {
 }
 
 // 加载 .env 文件（如果存在）
-if (class_exists(Env::class) && file_exists(base_path() . '/.env') && method_exists(Env::class, 'load')) {
-    Env::load(base_path() . '/.env');
+$envPath = base_path() . DIRECTORY_SEPARATOR . '.env';
+if (class_exists(Env::class) && file_exists($envPath) && method_exists(Env::class, 'load')) {
+    try {
+        Env::load($envPath);
+    } catch (Throwable $e) {
+        // 添加错误日志或处理
+        error_log("Failed to load .env file: " . $e->getMessage());
+    }
 }
 
 Config::clear();
