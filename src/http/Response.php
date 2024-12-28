@@ -22,9 +22,9 @@ use function gmdate;
 class Response extends \Workerman\Protocols\Http\Response
 {
     /**
-     * @var Throwable
+     * @var Throwable|null
      */
-    protected $exception = null;
+    protected ?Throwable $exception = null;
 
     /**
      * File
