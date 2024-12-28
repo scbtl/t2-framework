@@ -29,17 +29,17 @@ class Route
     /**
      * @var string|null
      */
-    protected $name = null;
+    protected ?string $name = null;
 
     /**
      * @var array
      */
-    protected $methods = [];
+    protected array $methods = [];
 
     /**
      * @var string
      */
-    protected $path = '';
+    protected string $path = '';
 
     /**
      * @var callable
@@ -49,18 +49,18 @@ class Route
     /**
      * @var array
      */
-    protected $middlewares = [];
+    protected array $middlewares = [];
 
     /**
      * @var array
      */
-    protected $params = [];
+    protected array $params = [];
 
     /**
-     * route constructor.
-     * @param array $methods
+     * route constructor
+     * @param $methods
      * @param string $path
-     * @param callable $callback
+     * @param $callback
      */
     public function __construct($methods, string $path, $callback)
     {
@@ -91,11 +91,11 @@ class Route
     }
 
     /**
-     * Middleware.
-     * @param mixed $middleware
+     * Middleware
+     * @param mixed|null $middleware
      * @return $this|array
      */
-    public function middleware(mixed $middleware = null)
+    public function middleware(mixed $middleware = null): array|static
     {
         if ($middleware === null) {
             return $this->middlewares;
@@ -123,10 +123,10 @@ class Route
     }
 
     /**
-     * GetCallback.
+     * GetCallback
      * @return callable|null
      */
-    public function getCallback()
+    public function getCallback(): ?callable
     {
         return $this->callback;
     }
@@ -141,16 +141,17 @@ class Route
     }
 
     /**
-     * Param.
+     * Param
      * @param string|null $name
-     * @param mixed $default
-     * @return mixed
+     * @param mixed|null $default
+     * @return array|mixed|null
      */
-    public function param(?string $name = null, mixed $default = null)
+    public function param(?string $name = null, mixed $default = null): mixed
     {
         if ($name === null) {
             return $this->params;
         }
+
         return $this->params[$name] ?? $default;
     }
 
@@ -162,6 +163,7 @@ class Route
     public function setParams(array $params): Route
     {
         $this->params = array_merge($this->params, $params);
+
         return $this;
     }
 
@@ -193,6 +195,7 @@ class Route
             }
             return $matches[0];
         }, $path);
+
         return count($parameters) > 0 ? $path . '?' . http_build_query($parameters) : $path;
     }
 
