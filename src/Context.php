@@ -34,11 +34,7 @@ class Context
 {
     protected static $objectStorage;
 
-    /**
-     * @var StdClass
-     */
     protected static $object;
-
 
     /**
      * @return void
