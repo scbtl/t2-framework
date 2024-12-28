@@ -18,13 +18,11 @@ use RedisException;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use InvalidArgumentException;
 
 /**
  * Class Cache
- * @package support\bootstrap
  *
  * Strings methods
  * @method static mixed get($key, $default = null)
@@ -41,7 +39,7 @@ class Cache
     /**
      * @var Psr16Cache[]
      */
-    public static $instances = [];
+    public static array $instances = [];
 
     /**
      * @param string|null $name
@@ -73,12 +71,6 @@ class Cache
                 case 'array':
                     $adapter = new ArrayAdapter(0, $stores[$name]['serialize'] ?? false, 0, 0);
                     break;
-                /**
-                 * Pdo can not reconnect when the connection is lost. So we can not use pdo as cache.
-                 */
-                /*case 'database':
-                    $adapter = new PdoAdapter(Db::connection($stores[$name]['connection'])->getPdo());
-                    break;*/
                 default:
                     throw new InvalidArgumentException("cache.store.$name.driver=$driver is not supported.");
             }
