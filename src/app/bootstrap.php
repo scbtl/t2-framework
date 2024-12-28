@@ -12,7 +12,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-use Dotenv\Dotenv;
+use app\Env;
 use app\Log;
 use t2\Bootstrap;
 use t2\Config;
@@ -42,12 +42,9 @@ if ($worker) {
     }, time());
 }
 
-if (class_exists('Dotenv\Dotenv') && file_exists(base_path(false) . '/.env')) {
-    if (method_exists('Dotenv\Dotenv', 'createUnsafeMutable')) {
-        Dotenv::createUnsafeMutable(base_path(false))->load();
-    } else {
-        Dotenv::createMutable(base_path(false))->load();
-    }
+// 加载 .env 文件（如果存在）
+if (class_exists(Env::class) && file_exists(base_path() . '/.env') && method_exists(Env::class, 'load')) {
+    Env::load(base_path() . '/.env');
 }
 
 Config::clear();
