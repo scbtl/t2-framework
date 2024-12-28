@@ -17,6 +17,7 @@ namespace app;
 use RuntimeException;
 use t2\Config;
 use t2\Util;
+use Throwable;
 use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
 use function base_path;
@@ -139,9 +140,25 @@ class App
      */
     private static function loadEnv(): void
     {
-        // 检查并加载 .env 文件
-        if (class_exists(Env::class) && method_exists(Env::class, 'load')) {
-            @Env::load(base_path('.env'));
+        // 检查 Env 类是否存在以及其是否具有 load 方法
+        if (!class_exists(Env::class) || !method_exists(Env::class, 'load')) {
+            return;
+        }
+
+        // 确定 .env 文件路径
+        $envFilePath = base_path('.env');
+        if (!file_exists($envFilePath)) {
+            // 可以选择记录日志，说明 .env 文件不存在
+            error_log("Environment file not found at: {$envFilePath}");
+            return;
+        }
+
+        // 加载 .env 文件并处理可能的异常
+        try {
+            Env::load($envFilePath);
+        } catch (Throwable $e) {
+            // 记录日志或处理加载失败
+            error_log("Failed to load environment file: " . $e->getMessage());
         }
     }
 
