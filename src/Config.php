@@ -58,17 +58,20 @@ class Config
         if (!$configPath) {
             return;
         }
+
         static::$loaded = false;
         $config = static::loadFromDir($configPath, $excludeFile);
         if (!$config) {
             static::$loaded = true;
             return;
         }
+
         if ($key !== null) {
             foreach (array_reverse(explode('.', $key)) as $k) {
                 $config = [$k => $config];
             }
         }
+
         static::$config = array_replace_recursive(static::$config, $config);
         static::formatConfig();
         static::$loaded = true;
@@ -109,10 +112,12 @@ class Config
                     $config['log']["plugin.$firm.$key"] = $item;
                 }
             }
+
             foreach ($projects as $name => $project) {
                 if (!is_array($project)) {
                     continue;
                 }
+
                 foreach ($project['log'] ?? [] as $key => $item) {
                     $config['log']["plugin.$firm.$name.$key"] = $item;
                 }
@@ -125,6 +130,7 @@ class Config
                     $config['database']['connections']["plugin.$firm.$key"] = $connection;
                 }
             }
+
             foreach ($projects as $name => $project) {
                 if (!is_array($project)) {
                     continue;
@@ -134,9 +140,11 @@ class Config
                 }
             }
         }
+
         if (!empty($config['database']['connections'])) {
             $config['database']['default'] = $config['database']['default'] ?? key($config['database']['connections']);
         }
+
         // Merge thinkorm config
         foreach ($config['plugin'] ?? [] as $firm => $projects) {
             if (isset($projects['app'])) {
@@ -144,6 +152,7 @@ class Config
                     $config['thinkorm']['connections']["plugin.$firm.$key"] = $connection;
                 }
             }
+
             foreach ($projects as $name => $project) {
                 if (!is_array($project)) {
                     continue;
@@ -153,9 +162,11 @@ class Config
                 }
             }
         }
+
         if (!empty($config['thinkorm']['connections'])) {
             $config['thinkorm']['default'] = $config['thinkorm']['default'] ?? key($config['thinkorm']['connections']);
         }
+
         // Merge redis config
         foreach ($config['plugin'] ?? [] as $firm => $projects) {
             if (isset($projects['app'])) {
@@ -163,15 +174,18 @@ class Config
                     $config['redis']["plugin.$firm.$key"] = $connection;
                 }
             }
+
             foreach ($projects as $name => $project) {
                 if (!is_array($project)) {
                     continue;
                 }
+
                 foreach ($project['redis'] ?? [] as $key => $connection) {
                     $config['redis']["plugin.$firm.$name.$key"] = $connection;
                 }
             }
         }
+
         static::$config = $config;
     }
 
@@ -191,10 +205,12 @@ class Config
             if (is_dir($file) || $file->getExtension() != 'php' || in_array($file->getBaseName('.php'), $excludeFile)) {
                 continue;
             }
+
             $appConfigFile = $file->getPath() . '/app.php';
             if (!is_file($appConfigFile)) {
                 continue;
             }
+
             $relativePath = str_replace($configPath . DIRECTORY_SEPARATOR, '', substr($file, 0, -4));
             $explode = array_reverse(explode(DIRECTORY_SEPARATOR, $relativePath));
             if (count($explode) >= 2) {
@@ -203,14 +219,17 @@ class Config
                     continue;
                 }
             }
+
             $config = include $file;
             foreach ($explode as $section) {
                 $tmp = [];
                 $tmp[$section] = $config;
                 $config = $tmp;
             }
+
             $allConfig = array_replace_recursive($allConfig, $config);
         }
+
         return $allConfig;
     }
 
@@ -225,6 +244,7 @@ class Config
         if ($key === null) {
             return static::$config;
         }
+
         $keyArray = explode('.', $key);
         $value = static::$config;
         $found = true;
@@ -238,9 +258,11 @@ class Config
             }
             $value = $value[$index];
         }
+
         if ($found) {
             return $value;
         }
+
         return static::read($key, $default);
     }
 
@@ -256,6 +278,7 @@ class Config
         if ($path === '') {
             return $default;
         }
+
         $keys = $keyArray = explode('.', $key);
         foreach ($keyArray as $index => $section) {
             unset($keys[$index]);
@@ -267,6 +290,7 @@ class Config
                 return $default;
             }
         }
+
         return $default;
     }
 
@@ -282,6 +306,7 @@ class Config
         if (!is_array($stack)) {
             return $default;
         }
+
         $value = $stack;
         foreach ($keyArray as $index) {
             if (!isset($value[$index])) {
@@ -289,6 +314,7 @@ class Config
             }
             $value = $value[$index];
         }
+
         return $value;
     }
 }
