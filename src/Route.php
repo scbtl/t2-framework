@@ -232,7 +232,7 @@ class Route
             $diffOptions = array_diff($options, ['index', 'create', 'store', 'update', 'show', 'edit', 'destroy', 'recovery']);
             if (!empty($diffOptions)) {
                 foreach ($diffOptions as $action) {
-                    static::any("/$name/{$action}[/{id}]", [$controller, $action])->name("$name.{$action}");
+                    static::any("/$name/{$action}[/{id}]", [$controller, $action])->name("$name.$action");
                 }
             }
             // 注册路由 由于顺序不同会导致路由无效 因此不适用循环注册
@@ -349,8 +349,9 @@ class Route
 
     /**
      * @param RouteObject $route
+     * @return void
      */
-    public function collect(RouteObject $route)
+    public function collect(RouteObject $route): void
     {
         $this->routes[] = $route;
     }
@@ -359,7 +360,7 @@ class Route
      * @param string $name
      * @param RouteObject $instance
      */
-    public static function setByName(string $name, RouteObject $instance)
+    public static function setByName(string $name, RouteObject $instance): void
     {
         static::$nameList[$name] = $instance;
     }
@@ -377,7 +378,7 @@ class Route
      * @param Route $route
      * @return void
      */
-    public function addChild(Route $route)
+    public function addChild(Route $route): void
     {
         $this->children[] = $route;
     }
@@ -385,7 +386,7 @@ class Route
     /**
      * @return Route[]
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -402,10 +403,10 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
-     * @return callable|false|string[]
+     * @param $callback
+     * @return array|callable|false|mixed|string[]
      */
-    public static function convertToCallable(string $path, $callback)
+    public static function convertToCallable(string $path, $callback): mixed
     {
         if (is_string($callback) && strpos($callback, '@')) {
             $callback = explode('@', $callback, 2);
@@ -429,9 +430,9 @@ class Route
     }
 
     /**
-     * @param array|string $methods
+     * @param $methods
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     protected static function addRoute($methods, string $path, $callback): RouteObject
@@ -442,9 +443,8 @@ class Route
         if ($callback = static::convertToCallable($path, $callback)) {
             static::$collector->addRoute($methods, $path, ['callback' => $callback, 'route' => $route]);
         }
-        if (static::$instance) {
-            static::$instance->collect($route);
-        }
+        static::$instance?->collect($route);
+
         return $route;
     }
 
@@ -490,11 +490,11 @@ class Route
     }
 
     /**
-     * SetCollector.
+     * SetCollector
      * @param RouteCollector $route
      * @return void
      */
-    public static function setCollector(RouteCollector $route)
+    public static function setCollector(RouteCollector $route): void
     {
         static::$collector = $route;
     }
