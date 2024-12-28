@@ -23,7 +23,7 @@ if (!defined('BASE_PATH')) {
     if (!$basePath = Phar::running()) {
         $basePath = getcwd();
         while ($basePath !== dirname($basePath)) {
-            if (is_dir("$basePath/vendor") && is_file("$basePath/start.php")) {
+            if (is_dir($basePath . DIRECTORY_SEPARATOR . 'vendor') && is_file($basePath . DIRECTORY_SEPARATOR . 'start.php')) {
                 break;
             }
 
@@ -544,7 +544,7 @@ if (!function_exists('worker_start')) {
         }
 
         $worker->onWorkerStart = function ($worker) use ($config) {
-            require_once __DIR__ . '/vendor/scbtl/t2-framework/src/app/bootstrap.php';
+            require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
             if (isset($config['handler'])) {
                 if (!class_exists($config['handler'])) {
                     echo "process error: class {$config['handler']} not exists\r\n";
