@@ -41,7 +41,7 @@ class Log
     /**
      * @var array
      */
-    protected static $instance = [];
+    protected static array $instance = [];
 
     /**
      * Channel.
