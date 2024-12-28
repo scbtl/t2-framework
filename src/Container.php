@@ -24,42 +24,42 @@ class Container implements ContainerInterface
     /**
      * @var array
      */
-    protected $instances = [];
+    protected array $instances = [];
     /**
      * @var array
      */
-    protected $definitions = [];
+    protected array $definitions = [];
 
     /**
-     * Get.
-     * @param string $name
-     * @return mixed
+     * Get
+     * @param string $id
+     * @return mixed|string
      * @throws NotFoundException
      */
-    public function get(string $name)
+    public function get(string $id): mixed
     {
-        if (!isset($this->instances[$name])) {
-            if (isset($this->definitions[$name])) {
-                $this->instances[$name] = call_user_func($this->definitions[$name], $this);
+        if (!isset($this->instances[$id])) {
+            if (isset($this->definitions[$id])) {
+                $this->instances[$id] = call_user_func($this->definitions[$id], $this);
             } else {
-                if (!class_exists($name)) {
-                    throw new NotFoundException("Class '$name' not found");
+                if (!class_exists($id)) {
+                    throw new NotFoundException("Class '$id' not found");
                 }
-                $this->instances[$name] = new $name();
+                $this->instances[$id] = new $id();
             }
         }
 
-        return $this->instances[$name];
+        return $this->instances[$id];
     }
 
     /**
-     * Has.
-     * @param string $name
+     * Has
+     * @param string $id
      * @return bool
      */
-    public function has(string $name): bool
+    public function has(string $id): bool
     {
-        return array_key_exists($name, $this->instances) || array_key_exists($name, $this->definitions);
+        return array_key_exists($id, $this->instances) || array_key_exists($id, $this->definitions);
     }
 
     /**
@@ -69,7 +69,7 @@ class Container implements ContainerInterface
      * @return mixed
      * @throws NotFoundException
      */
-    public function make(string $name, array $constructor = [])
+    public function make(string $name, array $constructor = []): mixed
     {
         if (!class_exists($name)) {
             throw new NotFoundException("Class '$name' not found");
