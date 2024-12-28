@@ -88,7 +88,7 @@ class LaravelDb implements Bootstrap
                     if ($connection->getConfig('driver') == 'mysql' && $connection->getRawPdo()) {
                         try {
                             $connection->select('select 1');
-                        } catch (Throwable $e) {
+                        } catch (Throwable) {
 
                         }
                     }
