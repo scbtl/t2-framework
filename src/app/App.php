@@ -149,7 +149,7 @@ class App
         $envFilePath = base_path('.env');
         if (!file_exists($envFilePath)) {
             // 可以选择记录日志，说明 .env 文件不存在
-            error_log("Environment file not found at: {$envFilePath}");
+            error_log("Environment file not found at: $envFilePath");
             return;
         }
 
