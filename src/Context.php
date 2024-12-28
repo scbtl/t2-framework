@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of webman.
  *
@@ -32,9 +31,11 @@ use function property_exists;
  */
 class Context
 {
-    protected static $objectStorage;
+    // $objectStorage 存储 WeakMap 或 SplObjectStorage 实例
+    protected static WeakMap|SplObjectStorage $objectStorage;
 
-    protected static $object;
+    // $object 存储 StdClass 实例
+    protected static StdClass $object;
 
     /**
      * @return void
