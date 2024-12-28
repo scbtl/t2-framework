@@ -16,7 +16,6 @@ namespace app;
 
 use Dotenv\Dotenv;
 use RuntimeException;
-use Throwable;
 use t2\Config;
 use t2\Util;
 use Workerman\Connection\TcpConnection;
@@ -31,11 +30,10 @@ use const DIRECTORY_SEPARATOR;
 class App
 {
     /**
-     * Run.
+     * Run
      * @return void
-     * @throws Throwable
      */
-    public static function run()
+    public static function run(): void
     {
         ini_set('display_errors', 'on');
         error_reporting(E_ALL);
@@ -129,7 +127,7 @@ class App
 
             $worker->onWorkerStart = function ($worker) {
                 require_once base_path() . '/app/bootstrap.php';
-                $app = new \t2\App(config('app.request_class', Request::class), Log::channel('default'), app_path(), public_path());
+                $app = new \t2\App(config('app.request_class', Request::class), Log::channel(), app_path(), public_path());
                 $worker->onMessage = [$app, 'onMessage'];
                 call_user_func([$app, 'onWorkerStart'], $worker);
             };
@@ -159,11 +157,11 @@ class App
     }
 
     /**
-     * LoadAllConfig.
+     * LoadAllConfig
      * @param array $excludes
      * @return void
      */
-    public static function loadAllConfig(array $excludes = [])
+    public static function loadAllConfig(array $excludes = []): void
     {
         Config::load(config_path(), $excludes);
         $directory = base_path() . '/plugin';
