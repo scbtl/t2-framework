@@ -29,6 +29,7 @@
     "ext-posix": "*",
     "ext-pcntl": "*",
     "ext-redis": "*",
+    "ext-simplexml": "*",
     "workerman/workerman": "^4.2.1 || ^5.0.0 || dev-master",
     "nikic/fast-route": "^1.3",
     "psr/container": ">=1.0",
