@@ -20,19 +20,19 @@ use function pathinfo;
 class UploadFile extends File
 {
     /**
-     * @var string
+     * @var string|null
      */
-    protected $uploadName = null;
+    protected ?string $uploadName = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected $uploadMimeType = null;
+    protected ?string $uploadMimeType = null;
 
     /**
-     * @var int
+     * @var int|null
      */
-    protected $uploadErrorCode = null;
+    protected ?int $uploadErrorCode = null;
 
     /**
      * UploadFile constructor.
@@ -52,7 +52,7 @@ class UploadFile extends File
 
     /**
      * GetUploadName
-     * @return string
+     * @return string|null
      */
     public function getUploadName(): ?string
     {
@@ -61,7 +61,7 @@ class UploadFile extends File
 
     /**
      * GetUploadMimeType
-     * @return string
+     * @return string|null
      */
     public function getUploadMimeType(): ?string
     {
@@ -79,7 +79,7 @@ class UploadFile extends File
 
     /**
      * GetUploadErrorCode
-     * @return int
+     * @return int|null
      */
     public function getUploadErrorCode(): ?int
     {
@@ -97,8 +97,7 @@ class UploadFile extends File
 
     /**
      * GetUploadMineType
-     * @return string
-     * @deprecated
+     * @return string|null
      */
     public function getUploadMineType(): ?string
     {
