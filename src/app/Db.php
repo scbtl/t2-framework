@@ -36,7 +36,7 @@ class Db extends Manager
     /**
      * @return Manager
      */
-    public static function getInstance()
+    public static function getInstance(): Manager
     {
         return static::$instance;
     }
@@ -44,7 +44,7 @@ class Db extends Manager
     /**
      * @return Connection[]
      */
-    public static function getConnections()
+    public static function getConnections(): array
     {
         return static::$instance->getDatabaseManager()->getConnections();
     }
