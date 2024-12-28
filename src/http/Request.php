@@ -30,11 +30,6 @@ class Request extends \Workerman\Protocols\Http\Request
     /**
      * @var string
      */
-    public $plugin = null;
-
-    /**
-     * @var string
-     */
     public $app = null;
 
     /**
