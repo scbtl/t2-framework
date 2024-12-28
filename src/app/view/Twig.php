@@ -14,6 +14,7 @@
 
 namespace app\view;
 
+use RuntimeException;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -30,15 +31,31 @@ use function request;
 class Twig implements View
 {
     /**
-     * Assign
-     * @param string|array $name
-     * @param mixed|null $value
+     * Assign variables to the view.
+     *
+     * @param string|array $name Variable name or an associative array of variables.
+     * @param mixed|null $value Value of the variable (ignored if $name is an array).
      * @return void
+     * @throws RuntimeException If the request object is not available.
      */
     public static function assign(string|array $name, mixed $value = null): void
     {
+        // Get the current request object
         $request = request();
-        $request->_view_vars = array_merge($request->_view_vars, is_array($name) ? $name : [$name => $value]);
+
+        // Check if the request object is valid
+        if (!$request) {
+            throw new RuntimeException('Request object not found.');
+        }
+
+        // Ensure _view_vars is initialized as an array
+        if (!isset($request->_view_vars)) {
+            $request->_view_vars = [];
+        }
+
+        // Merge new variables into the _view_vars array
+        $variables = is_array($name) ? $name : [$name => $value];
+        $request->_view_vars = array_merge($request->_view_vars, $variables);
     }
 
     /**
