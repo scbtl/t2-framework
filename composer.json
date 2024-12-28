@@ -1,0 +1,52 @@
+{
+  "name": "scbtl/t2-framework",
+  "type": "library",
+  "keywords": [
+    "high performance",
+    "http service"
+  ],
+  "homepage": "https://www.t2engine.cn",
+  "license": "MIT",
+  "description": "High performance HTTP Service Framework.",
+  "authors": [
+    {
+      "name": "Tony",
+      "email": "lucky@t2engine.cn",
+      "homepage": "https://www.t2engine.cn",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "lucky@t2engine.cn",
+    "issues": "https://github.com/scbtl/t2-framework/issues",
+    "forum": "https://forum.t2engine.cn/",
+    "wiki": "https://doc.t2engine.cn/",
+    "source": "https://github.com/scbtl/t2-framework"
+  },
+  "require": {
+    "php": ">=8.3",
+    "ext-json": "*",
+    "workerman/workerman": "^4.2.1 || ^5.0.0 || dev-master",
+    "nikic/fast-route": "^1.3",
+    "psr/container": ">=1.0",
+    "monolog/monolog": "^2.0",
+    "ext-zend-opcache": "*"
+  },
+  "suggest": {
+    "ext-event": "For better performance. "
+  },
+  "autoload": {
+    "psr-4": {
+      "t2\\": "./src",
+      "app\\": "./src/app",
+      "app\\bootstrap\\": "./src/app/bootstrap",
+      "app\\exception\\": "./src/app/exception",
+      "app\\view\\": "./src/app/view"
+    },
+    "files": [
+      "./src/app/helpers.php"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
