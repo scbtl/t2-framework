@@ -32,9 +32,6 @@ use function property_exists;
  */
 class Context
 {
-    /**
-     * @var SplObjectStorage|WeakMap
-     */
     protected static $objectStorage;
 
     /**
