@@ -52,10 +52,10 @@ if (!function_exists('run_path')) {
 if (!function_exists('base_path')) {
     /**
      * if the param $path equal false,will return this program current execute directory
-     * @param string|false $path
+     * @param false|string $path
      * @return string
      */
-    function base_path($path = ''): string
+    function base_path(false|string $path = ''): string
     {
         if (false === $path) {
             return run_path();
@@ -250,7 +250,7 @@ if (!function_exists('request')) {
      * Get request
      * @return \t2\http\Request|Request|null
      */
-    function request()
+    function request(): \t2\http\Request|Request|null
     {
         return App::request();
     }
@@ -263,7 +263,7 @@ if (!function_exists('config')) {
      * @param mixed $default
      * @return mixed
      */
-    function config(?string $key = null, mixed $default = null)
+    function config(?string $key = null, mixed $default = null): mixed
     {
         return Config::get($key, $default);
     }
@@ -305,7 +305,7 @@ if (!function_exists('session')) {
      */
     function session(array|string|null $key = null, mixed $default = null): mixed
     {
-        $session = \request()->session();
+        $session = request()->session();
         if (null === $key) {
             return $session;
         }
@@ -388,7 +388,7 @@ if (!function_exists('copy_dir')) {
      * @param bool $overwrite
      * @return void
      */
-    function copy_dir(string $source, string $dest, bool $overwrite = false)
+    function copy_dir(string $source, string $dest, bool $overwrite = false): void
     {
         if (is_dir($source)) {
             if (!is_dir($dest)) {
@@ -432,8 +432,9 @@ if (!function_exists('worker_bind')) {
      * Bind worker
      * @param $worker
      * @param $class
+     * @return void
      */
-    function worker_bind($worker, $class)
+    function worker_bind($worker, $class): void
     {
         $callbackMap = [
             'onConnect',
@@ -465,7 +466,7 @@ if (!function_exists('worker_start')) {
      * @param $config
      * @return void
      */
-    function worker_start($processName, $config)
+    function worker_start($processName, $config): void
     {
         if (isset($config['enable']) && !$config['enable']) {
             return;
@@ -514,7 +515,7 @@ if (!function_exists('get_realpath')) {
      */
     function get_realpath(string $filePath): string
     {
-        if (strpos($filePath, 'phar://') === 0) {
+        if (str_starts_with($filePath, 'phar://')) {
             return $filePath;
         } else {
             return realpath($filePath);
@@ -580,7 +581,7 @@ if (!function_exists('cpu_count')) {
             } else {
                 try {
                     $count = (int)shell_exec('nproc');
-                } catch (\Throwable $ex) {
+                } catch (Throwable) {
                     // Do nothing
                 }
             }
