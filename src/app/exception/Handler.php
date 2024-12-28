@@ -24,7 +24,7 @@ class Handler extends ExceptionHandler
     /**
      * @var string[]
      */
-    public $dontReport = [
+    public array $dontReport = [
         BusinessException::class,
     ];
 

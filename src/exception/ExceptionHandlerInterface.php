@@ -22,9 +22,9 @@ interface ExceptionHandlerInterface
 {
     /**
      * @param Throwable $exception
-     * @return mixed
+     * @return void
      */
-    public function report(Throwable $exception);
+    public function report(Throwable $exception): void;
 
     /**
      * @param Request $request

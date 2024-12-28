@@ -25,12 +25,12 @@ class BusinessException extends RuntimeException
     /**
      * @var array
      */
-    protected $data = [];
+    protected array $data = [];
 
     /**
      * @var bool
      */
-    protected $debug = false;
+    protected bool $debug = false;
 
     /**
      * Render an exception into an HTTP response.
@@ -42,9 +42,9 @@ class BusinessException extends RuntimeException
         if ($request->expectsJson()) {
             $code = $this->getCode();
             $json = ['code' => $code ?: 500, 'msg' => $this->getMessage(), 'data' => $this->data];
-            return new Response(200, ['Content-Type' => 'application/json'],
-                json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            return new Response(200, ['Content-Type' => 'application/json'], json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
+
         return new Response(200, [], $this->getMessage());
     }
 
@@ -59,6 +59,7 @@ class BusinessException extends RuntimeException
             return $this->data;
         }
         $this->data = $data;
+
         return $this;
     }
 
@@ -73,6 +74,7 @@ class BusinessException extends RuntimeException
             return $this->debug;
         }
         $this->debug = $value;
+
         return $this;
     }
 
@@ -101,7 +103,8 @@ class BusinessException extends RuntimeException
         }
         try {
             $message = trans($message, $args, $domain, $locale);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
+            
         }
         foreach ($parameters as $key => $value) {
             $message = str_replace(":$key", $value, $message);

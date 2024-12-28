@@ -25,19 +25,19 @@ use function trim;
 class ExceptionHandler implements ExceptionHandlerInterface
 {
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
-    protected $logger = null;
+    protected ?LoggerInterface $logger = null;
 
     /**
      * @var bool
      */
-    protected $debug = false;
+    protected bool $debug = false;
 
     /**
      * @var array
      */
-    public $dontReport = [];
+    public array $dontReport = [];
 
     /**
      * ExceptionHandler constructor.
@@ -54,7 +54,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      * @param Throwable $exception
      * @return void
      */
-    public function report(Throwable $exception)
+    public function report(Throwable $exception): void
     {
         if ($this->shouldntReport($exception)) {
             return;
