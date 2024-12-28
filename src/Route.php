@@ -14,7 +14,6 @@
 
 namespace t2;
 
-use FastRoute\Dispatcher\GroupCountBased;
 use FastRoute\RouteCollector;
 use FilesystemIterator;
 use Psr\Container\ContainerExceptionInterface;
@@ -41,73 +40,73 @@ use function strpos;
 class Route
 {
     /**
-     * @var Route
+     * @var Route|null
      */
-    protected static $instance = null;
+    protected static ?Route $instance = null;
 
     /**
-     * @var GroupCountBased
+     * @var null
      */
-    protected static $dispatcher = null;
+    protected static null $dispatcher = null;
 
     /**
-     * @var RouteCollector
+     * @var RouteCollector|null
      */
-    protected static $collector = null;
+    protected static ?RouteCollector $collector = null;
 
     /**
      * @var RouteObject[]
      */
-    protected static $fallbackRoutes = [];
+    protected static array $fallbackRoutes = [];
 
     /**
      * @var array
      */
-    protected static $fallback = [];
+    protected static array $fallback = [];
 
     /**
      * @var array
      */
-    protected static $nameList = [];
+    protected static array $nameList = [];
 
     /**
      * @var string
      */
-    protected static $groupPrefix = '';
-
-    /**
-     * @var bool
-     */
-    protected static $disabledDefaultRoutes = [];
+    protected static string $groupPrefix = '';
 
     /**
      * @var array
      */
-    protected static $disabledDefaultRouteControllers = [];
+    protected static array $disabledDefaultRoutes = [];
 
     /**
      * @var array
      */
-    protected static $disabledDefaultRouteActions = [];
+    protected static array $disabledDefaultRouteControllers = [];
+
+    /**
+     * @var array
+     */
+    protected static array $disabledDefaultRouteActions = [];
 
     /**
      * @var RouteObject[]
      */
-    protected static $allRoutes = [];
+    protected static array $allRoutes = [];
 
     /**
      * @var RouteObject[]
      */
-    protected $routes = [];
+    protected array $routes = [];
 
     /**
      * @var Route[]
      */
-    protected $children = [];
+    protected array $children = [];
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function get(string $path, $callback): RouteObject
@@ -117,7 +116,7 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function post(string $path, $callback): RouteObject
@@ -127,7 +126,7 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function put(string $path, $callback): RouteObject
@@ -137,7 +136,7 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function patch(string $path, $callback): RouteObject
@@ -147,7 +146,7 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function delete(string $path, $callback): RouteObject
@@ -157,7 +156,7 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function head(string $path, $callback): RouteObject
@@ -167,7 +166,7 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function options(string $path, $callback): RouteObject
@@ -177,7 +176,7 @@ class Route
 
     /**
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function any(string $path, $callback): RouteObject
@@ -188,7 +187,7 @@ class Route
     /**
      * @param $method
      * @param string $path
-     * @param callable|mixed $callback
+     * @param $callback
      * @return RouteObject
      */
     public static function add($method, string $path, $callback): RouteObject
@@ -197,9 +196,9 @@ class Route
     }
 
     /**
-     * @param string|callable $path
+     * @param $path
      * @param callable|null $callback
-     * @return static
+     * @return Route
      */
     public static function group($path, ?callable $callback = null): Route
     {
@@ -207,6 +206,7 @@ class Route
             $callback = $path;
             $path = '';
         }
+
         $previousGroupPrefix = static::$groupPrefix;
         static::$groupPrefix = $previousGroupPrefix . $path;
         $previousInstance = static::$instance;
@@ -214,9 +214,8 @@ class Route
         static::$collector->addGroup($path, $callback);
         static::$groupPrefix = $previousGroupPrefix;
         static::$instance = $previousInstance;
-        if ($previousInstance) {
-            $previousInstance->addChild($instance);
-        }
+        $previousInstance?->addChild($instance);
+
         return $instance;
     }
 
@@ -226,7 +225,7 @@ class Route
      * @param array $options
      * @return void
      */
-    public static function resource(string $name, string $controller, array $options = [])
+    public static function resource(string $name, string $controller, array $options = []): void
     {
         $name = trim($name, '/');
         if (is_array($options) && !empty($options)) {
@@ -450,15 +449,16 @@ class Route
     }
 
     /**
-     * Load.
-     * @param mixed $paths
+     * Load
+     * @param $paths
      * @return void
      */
-    public static function load($paths)
+    public static function load($paths): void
     {
         if (!is_array($paths)) {
             return;
         }
+
         static::$dispatcher = simpleDispatcher(function (RouteCollector $route) use ($paths) {
             Route::setCollector($route);
             foreach ($paths as $configPath) {
@@ -500,31 +500,31 @@ class Route
     }
 
     /**
-     * Fallback.
-     * @param callable|mixed $callback
+     * Fallback
+     * @param callable $callback
      * @param string $plugin
-     * @return void
+     * @return RouteObject
      */
-    public static function fallback(callable $callback, string $plugin = '')
+    public static function fallback(callable $callback, string $plugin = ''): RouteObject
     {
         $route = new RouteObject([], '', $callback);
         static::$fallbackRoutes[$plugin] = $route;
+
         return $route;
     }
 
     /**
-     * GetFallBack.
+     * GetFallBack
      * @param string $plugin
      * @param int $status
-     * @return callable|null
+     * @return mixed
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    public static function getFallback(string $plugin = '', int $status = 404)
+    public static function getFallback(string $plugin = '', int $status = 404): mixed
     {
         if (!isset(static::$fallback[$plugin])) {
-            $callback = null;
             $route = static::$fallbackRoutes[$plugin] ?? null;
             static::$fallback[$plugin] = $route ? App::getCallback($plugin, 'NOT_FOUND', $route->getCallback(), ['status' => $status], false, $route) : null;
         }
