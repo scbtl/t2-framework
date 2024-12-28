@@ -30,18 +30,17 @@ class Context
     /**
      * @var SplObjectStorage|WeakMap
      */
-    protected static $objectStorage;
+    protected static WeakMap|SplObjectStorage $objectStorage;
 
     /**
      * @var StdClass
      */
-    protected static $object;
-
+    protected static StdClass $object;
 
     /**
      * @return void
      */
-    public static function init()
+    public static function init(): void
     {
         if (!static::$objectStorage) {
             static::$objectStorage = class_exists(WeakMap::class) ? new WeakMap() : new SplObjectStorage();
@@ -63,27 +62,23 @@ class Context
     }
 
     /**
-     * @return mixed
+     * @return Fiber|StdClass|null
      */
-    protected static function getKey()
+    protected static function getKey(): StdClass|Fiber|null
     {
-        switch (Worker::$eventLoopClass) {
-            case Revolt::class:
-                return Fiber::getCurrent();
-            case Swoole::class:
-                return \Swoole\Coroutine::getContext();
-            case Swow::class:
-                return Coroutine::getCurrent();
-        }
-
-        return static::$object;
+        return match (Worker::$eventLoopClass) {
+            Revolt::class => Fiber::getCurrent(),
+            Swoole::class => \Swoole\Coroutine::getContext(),
+            Swow::class   => Coroutine::getCurrent(),
+            default       => static::$object,
+        };
     }
 
     /**
      * @param string|null $key
-     * @return mixed
+     * @return StdClass|null
      */
-    public static function get(?string $key = null)
+    public static function get(?string $key = null): ?StdClass
     {
         $obj = static::getObject();
         if ($key === null) {
