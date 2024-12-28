@@ -104,6 +104,7 @@ class App
 
             $worker->onWorkerStart = function ($worker) {
                 require_once base_path() . '/app/bootstrap.php';
+                dump(1);
                 $app = new \t2\App(config('app.request_class', Request::class), Log::channel(), app_path(), public_path());
                 $worker->onMessage = [$app, 'onMessage'];
                 call_user_func([$app, 'onWorkerStart'], $worker);
