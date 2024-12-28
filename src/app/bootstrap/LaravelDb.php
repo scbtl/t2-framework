@@ -38,7 +38,7 @@ class LaravelDb implements Bootstrap
      *
      * @return void
      */
-    public static function start(?Worker $worker)
+    public static function start(?Worker $worker): void
     {
         if (!class_exists(Capsule::class)) {
             return;
@@ -101,7 +101,7 @@ class LaravelDb implements Bootstrap
             if (method_exists(Paginator::class, 'queryStringResolver')) {
                 Paginator::queryStringResolver(function () {
                     $request = request();
-                    return $request ? $request->queryString() : null;
+                    return $request?->queryString();
                 });
             }
 
