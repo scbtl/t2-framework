@@ -38,7 +38,7 @@ class Twig implements View
     public static function assign(string|array $name, mixed $value = null): void
     {
         $request = request();
-        $request->_view_vars = array_merge((array)$request->_view_vars, is_array($name) ? $name : [$name => $value]);
+        $request->_view_vars = array_merge($request->_view_vars, is_array($name) ? $name : [$name => $value]);
     }
 
     /**
