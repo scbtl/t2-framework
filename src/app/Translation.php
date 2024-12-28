@@ -39,7 +39,7 @@ class Translation
     /**
      * @var Translator[]
      */
-    protected static $instance = [];
+    protected static array $instance = [];
 
     /**
      * Instance.
@@ -66,10 +66,11 @@ class Translation
                     'format'    => 'pofile'
                 ]
             ];
+
             foreach ($paths as $path) {
                 // Phar support. Compatible with the 'realpath' function in the phar file.
                 if (!$translationsPath = get_realpath($path)) {
-                    throw new NotFoundException("File {$path} not found");
+                    throw new NotFoundException("File $path not found");
                 }
 
                 foreach ($classes as $class => $opts) {
@@ -81,6 +82,7 @@ class Translation
                         $domain = basename($file, $opts['extension']);
                         $dirName = pathinfo($file, PATHINFO_DIRNAME);
                         $locale = substr(strrchr($dirName, DIRECTORY_SEPARATOR), 1);
+
                         if ($domain && $locale) {
                             $translator->addResource($opts['format'], $file, $locale, $domain);
                         }
