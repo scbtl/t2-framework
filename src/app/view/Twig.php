@@ -30,9 +30,10 @@ use function request;
 class Twig implements View
 {
     /**
-     * Assign.
+     * Assign
      * @param string|array $name
-     * @param mixed $value
+     * @param mixed|null $value
+     * @return void
      */
     public static function assign(string|array $name, mixed $value = null): void
     {
@@ -41,12 +42,15 @@ class Twig implements View
     }
 
     /**
-     * Render.
+     * Render
      * @param string $template
      * @param array $vars
      * @param string|null $app
      * @param string|null $plugin
      * @return string
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public static function render(string $template, array $vars, ?string $app = null, ?string $plugin = null): string
     {

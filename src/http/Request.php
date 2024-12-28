@@ -53,6 +53,11 @@ class Request extends \Workerman\Protocols\Http\Request
     public $route = null;
 
     /**
+     * @var array
+     */
+    public array $_view_vars = [];
+
+    /**
      * @var bool
      */
     protected $isDirty = false;
@@ -212,15 +217,11 @@ class Request extends \Workerman\Protocols\Http\Request
         if ($safeMode && !static::isIntranetIp($remoteIp)) {
             return $remoteIp;
         }
-        $ip = $this->header('x-forwarded-for')
-            ?? $this->header('x-real-ip')
-            ?? $this->header('client-ip')
-            ?? $this->header('x-client-ip')
-            ?? $this->header('via')
-            ?? $remoteIp;
+        $ip = $this->header('x-forwarded-for') ?? $this->header('x-real-ip') ?? $this->header('client-ip') ?? $this->header('x-client-ip') ?? $this->header('via') ?? $remoteIp;
         if (is_string($ip)) {
             $ip = current(explode(',', $ip));
         }
+
         return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : $remoteIp;
     }
 
@@ -309,14 +310,17 @@ class Request extends \Workerman\Protocols\Http\Request
         if (!filter_var($ip, FILTER_VALIDATE_IP)) {
             return false;
         }
+
         // Is intranet ip ? For IPv4, the result of false may not be accurate, so we need to check it manually later .
         if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
             return true;
         }
+
         // Manual check only for IPv4 .
         if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             return false;
         }
+
         // Manual check .
         $reservedIps = [
             1681915904 => 1686110207, // 100.64.0.0 -  100.127.255.255
@@ -334,6 +338,7 @@ class Request extends \Workerman\Protocols\Http\Request
                 return true;
             }
         }
+
         return false;
     }
 
@@ -352,6 +357,7 @@ class Request extends \Workerman\Protocols\Http\Request
         } else {
             $this->_data['get'] = $input;
         }
+
         return $this;
     }
 
@@ -370,6 +376,7 @@ class Request extends \Workerman\Protocols\Http\Request
         } else {
             $this->_data['post'] = $input;
         }
+
         return $this;
     }
 
@@ -388,6 +395,7 @@ class Request extends \Workerman\Protocols\Http\Request
         } else {
             $this->_data['headers'] = $input;
         }
+
         return $this;
     }
 
