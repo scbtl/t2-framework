@@ -160,6 +160,7 @@ class App
                 $callback = static::getFallback($plugin, $status);
                 $request->app = $request->controller = $request->action = '';
                 static::send($connection, $callback($request), $request);
+
                 return null;
             }
             $app = $controllerAndAction['app'];
@@ -172,6 +173,7 @@ class App
         } catch (Throwable $e) {
             static::send($connection, static::exceptionResponse($e, $request), $request);
         }
+
         return null;
     }
 
@@ -272,10 +274,12 @@ class App
             $exceptionHandler->report($e);
             $response = $exceptionHandler->render($request, $e);
             $response->exception($e);
+
             return $response;
         } catch (Throwable $e) {
             $response = new Response(500, [], static::config($plugin ?? '', 'app.debug', true) ? (string)$e : $e->getMessage());
             $response->exception($e);
+
             return $response;
         }
     }
@@ -313,9 +317,11 @@ class App
             } elseif ($middleware instanceof Closure) {
                 $middleware = call_user_func($middleware, $container);
             }
+
             if (!$middleware instanceof MiddlewareInterface) {
                 throw new InvalidArgumentException('Not support middleware type');
             }
+
             $middlewares[$key][0] = $middleware;
         }
 
@@ -368,6 +374,7 @@ class App
                     }
                     $response = new Response(200, [], $response);
                 }
+
                 return $response;
             });
         } else {
@@ -379,6 +386,7 @@ class App
                 };
             }
         }
+
         return $callback;
     }
 
@@ -394,8 +402,8 @@ class App
     {
         return function (Request $request) use ($plugin, $call, $args) {
             $reflector = static::getReflector($call);
-            $args = array_values(static::resolveMethodDependencies(static::container($plugin), $request,
-                array_merge($request->all(), $args), $reflector, static::config($plugin, 'app.debug')));
+            $args = array_values(static::resolveMethodDependencies(static::container($plugin), $request, array_merge($request->all(), $args), $reflector, static::config($plugin, 'app.debug')));
+
             return $call(...$args);
         };
     }
@@ -412,11 +420,14 @@ class App
         if (is_array($call) && !method_exists($call[0], $call[1])) {
             return false;
         }
+
         $reflector = static::getReflector($call);
         $reflectionParameters = $reflector->getParameters();
+
         if (!$reflectionParameters) {
             return false;
         }
+
         $firstParameter = current($reflectionParameters);
         unset($reflectionParameters[key($reflectionParameters)]);
         $adaptersList = ['int', 'string', 'bool', 'array', 'object', 'float', 'mixed', 'resource'];
@@ -460,12 +471,15 @@ class App
                 }
             }
         }
+
         if (array_keys($args) !== $keys) {
             return true;
         }
+
         if (!$firstParameter->hasType()) {
             return $firstParameter->getName() !== 'request';
         }
+
         if (!is_a(static::$requestClass, $firstParameter->getType()->getName(), true)) {
             return true;
         }
@@ -484,6 +498,7 @@ class App
         if ($call instanceof Closure || is_string($call)) {
             return new ReflectionFunction($call);
         }
+
         return new ReflectionMethod($call[0], $call[1]);
     }
 
@@ -595,6 +610,7 @@ class App
                     break;
             }
         }
+
         return $parameters;
     }
 
@@ -651,6 +667,7 @@ class App
             if ($args) {
                 $route->setParams($args);
             }
+
             if (is_array($callback)) {
                 $controller = $callback[0];
                 $plugin = static::getPluginByClass($controller);
@@ -659,13 +676,16 @@ class App
             } else {
                 $plugin = static::getPluginByPath($path);
             }
+
             $callback = static::getCallback($plugin, $app, $callback, $args, true, $route);
             static::collectCallbacks($key, [$callback, $plugin, $app, $controller ?: '', $action, $route]);
             [$callback, $request->plugin, $request->app, $request->controller, $request->action, $request->route] = static::$callbacks[$key];
             static::send($connection, $callback($request), $request);
+
             return true;
         }
         $status = $routeInfo[0] === Dispatcher::METHOD_NOT_ALLOWED ? 405 : 404;
+
         return false;
     }
 
@@ -698,6 +718,7 @@ class App
         } else {
             $publicDir = static::$publicPath;
         }
+
         $file = "$publicDir/$path";
         if (!is_file($file)) {
             return false;
@@ -707,11 +728,13 @@ class App
             if (!static::config($plugin, 'app.support_php_files', false)) {
                 return false;
             }
+
             static::collectCallbacks($key, [function () use ($file) {
                 return static::execPhpFile($file);
             }, '', '', '', '', null]);
             [, $request->plugin, $request->app, $request->controller, $request->action, $request->route] = static::$callbacks[$key];
             static::send($connection, static::execPhpFile($file), $request);
+
             return true;
         }
 
@@ -729,6 +752,7 @@ class App
         }, [], false), '', '', '', '', null]);
         [$callback, $request->plugin, $request->app, $request->controller, $request->action, $request->route] = static::$callbacks[$key];
         static::send($connection, $callback($request), $request);
+
         return true;
     }
 
@@ -743,13 +767,11 @@ class App
     {
         $keepAlive = $request->header('connection');
         Context::destroy();
-        if (($keepAlive === null && $request->protocolVersion() === '1.1')
-            || $keepAlive === 'keep-alive' || $keepAlive === 'Keep-Alive'
-            || (is_a($response, Response::class) && $response->getHeader('Transfer-Encoding') === 'chunked')
-        ) {
+        if (($keepAlive === null && $request->protocolVersion() === '1.1') || $keepAlive === 'keep-alive' || $keepAlive === 'Keep-Alive' || (is_a($response, Response::class) && $response->getHeader('Transfer-Encoding') === 'chunked')) {
             $connection->send($response);
             return;
         }
+
         $connection->close($response);
     }
 
@@ -790,6 +812,7 @@ class App
                 unset($cache[key($cache)]);
             }
         }
+
         return $controllerAction;
     }
 
@@ -810,9 +833,11 @@ class App
             array_splice($tmp, $index, 1, [$section, 'controller']);
             $map[] = trim("$classPrefix\\" . implode('\\', array_merge(['app'], $tmp)), '\\');
         }
+
         foreach ($map as $item) {
             $map[] = $item . '\\index';
         }
+
         foreach ($map as $controllerClass) {
             // Remove xx\xx\controller
             if (substr($controllerClass, -11) === '\\controller') {
@@ -823,6 +848,7 @@ class App
                 return $controllerAction;
             }
         }
+
         return false;
     }
 
@@ -836,9 +862,10 @@ class App
     protected static function getControllerAction(string $controllerClass, string $action)
     {
         // Disable calling magic methods
-        if (strpos($action, '__') === 0) {
+        if (str_starts_with($action, '__')) {
             return false;
         }
+
         if (($controllerClass = static::getController($controllerClass)) && ($action = static::getAction($controllerClass, $action))) {
             return [
                 'plugin'     => static::getPluginByClass($controllerClass),
@@ -847,6 +874,7 @@ class App
                 'action'     => $action
             ];
         }
+
         return false;
     }
 
@@ -861,6 +889,7 @@ class App
         if (class_exists($controllerClass)) {
             return (new ReflectionClass($controllerClass))->name;
         }
+
         $explodes = explode('\\', strtolower(ltrim($controllerClass, '\\')));
         $basePath = $explodes[0] === 'plugin' ? BASE_PATH . '/plugin' : static::$appPath;
         unset($explodes[0]);
@@ -870,6 +899,7 @@ class App
             if (!$found) {
                 break;
             }
+
             $dirs = Util::scanDir($basePath, false);
             $found = false;
             foreach ($dirs as $name) {
@@ -882,9 +912,11 @@ class App
                 }
             }
         }
+
         if (!$found) {
             return false;
         }
+
         foreach (scandir($basePath) ?: [] as $name) {
             if (strtolower($name) === $fileName) {
                 require_once "$basePath/$name";
@@ -893,6 +925,7 @@ class App
                 }
             }
         }
+
         return false;
     }
 
@@ -914,16 +947,20 @@ class App
                 break;
             }
         }
+
         if ($found) {
             return $action;
         }
+
         // Action is not public method
         if (method_exists($controllerClass, $action)) {
             return false;
         }
+
         if (method_exists($controllerClass, '__call')) {
             return $action;
         }
+
         return false;
     }
 
@@ -939,6 +976,7 @@ class App
         if ($tmp[0] !== 'plugin') {
             return '';
         }
+
         return $tmp[1] ?? '';
     }
 
@@ -954,10 +992,12 @@ class App
         if ($tmp[0] !== 'app') {
             return '';
         }
+
         $plugin = $tmp[1] ?? '';
         if ($plugin && !static::config('', "plugin.$plugin.app")) {
             return '';
         }
+
         return $plugin;
     }
 
@@ -974,6 +1014,7 @@ class App
         if (!isset($tmp[$pos])) {
             return '';
         }
+
         return strtolower($tmp[$pos]) === 'controller' ? '' : $tmp[$pos];
     }
 
@@ -991,6 +1032,7 @@ class App
         } catch (Exception $e) {
             echo $e;
         }
+
         return ob_get_clean();
     }
 
@@ -1009,6 +1051,7 @@ class App
                 return $candidate;
             }
         }
+
         return $method;
     }
 
