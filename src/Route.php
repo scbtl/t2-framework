@@ -14,7 +14,7 @@
 
 namespace t2;
 
-use FastRoute\Dispatcher\GroupCountBased;
+use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FilesystemIterator;
 use Psr\Container\ContainerExceptionInterface;
@@ -46,9 +46,9 @@ class Route
     protected static ?Route $instance = null;
 
     /**
-     * @var GroupCountBased
+     * @var Dispatcher|null
      */
-    protected static $dispatcher = null;
+    protected static ?Dispatcher $dispatcher = null;
 
     /**
      * @var RouteCollector|null
