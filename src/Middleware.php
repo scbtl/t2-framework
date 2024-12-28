@@ -26,14 +26,14 @@ class Middleware
     /**
      * @var array
      */
-    protected static $instances = [];
+    protected static array $instances = [];
 
     /**
-     * @param mixed $allMiddlewares
+     * @param $allMiddlewares
      * @param string $plugin
      * @return void
      */
-    public static function load($allMiddlewares, string $plugin = '')
+    public static function load($allMiddlewares, string $plugin = ''): void
     {
         if (!is_array($allMiddlewares)) {
             return;
@@ -48,7 +48,7 @@ class Middleware
                 $plugin = '';
             }
 
-            if (strpos($appName, 'plugin.') !== false) {
+            if (str_contains($appName, 'plugin.')) {
                 $explode = explode('.', $appName, 4);
                 $plugin = $explode[1];
                 $appName = $explode[2] ?? '';
@@ -72,7 +72,7 @@ class Middleware
      * @param bool $withGlobalMiddleware
      * @return array
      */
-    public static function getMiddleware(string $plugin, string $appName, string $controller, bool $withGlobalMiddleware = true)
+    public static function getMiddleware(string $plugin, string $appName, string $controller, bool $withGlobalMiddleware = true): array
     {
         $globalMiddleware = $withGlobalMiddleware ? static::$instances['']['@'] ?? [] : [];
         $appGlobalMiddleware = $withGlobalMiddleware && isset(static::$instances[$plugin]['']) ? static::$instances[$plugin][''] : [];
